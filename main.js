@@ -17,7 +17,7 @@ const main = () => {
     inquirer
         .prompt([{
             type: "input",
-            message: "What is the domain of the report you want to run? DOMAIN.instructure.com",
+            message: "What is the domain (not '.instructure.com') of where the report is that you want to run?",
             name: "domain",
         }])
         .then(answers => {
@@ -27,59 +27,55 @@ const main = () => {
                     'Authorization': `Bearer ${token}`
                 }
             })
-            // new Promise((resolve, reject) => {
+            // getting list of reports from domain
             instance.get(`/accounts/self/reports`)
                 .then(reports => {
-                    const listOfReports = [];
+                    const reportTitles = [];
                     reports.data.forEach(report => {
-                        listOfReports.push(report.title)
+                        reportTitles.push(report.title)
                     });
+                    // prompting which report specifically want to run
                     new inquirer
                         .prompt({
                             type: "list",
                             message: "What report do you want to run?",
-                            choices: listOfReports,
+                            choices: reportTitles,
                             name: 'report'
                         })
                         .then(res => {
-                            let params;
+                            let params = {};
+                            // If wanting provisioning or sis export, what items within there do they want?
                             if (res.report === 'Provisioning' || res.report === 'SIS Export') {
                                 new inquirer
                                     .prompt({
                                         type: "checkbox",
                                         message: "What types of files do you want to run?",
-                                        choices: ['Basic Provisioning', 'all', 'users', 'accounts', 'terms', 'courses', 'sections', 'enrollments', 'groups', 'group membership', 'group categories', 'x list', 'user observer', 'admin', 'created by sis'],
+                                        choices: ['users', 'accounts', 'terms', 'courses', 'sections', 'enrollments', 'groups', 'group_membership', 'group_categories', 'x_list', 'user_observer', 'admin', 'created_by_sis'],
                                         name: 'objects'
                                     })
                                     .then(res => {
-                                        console.log("🚀 ~ file: main.js ~ line 57 ~ //newPromise ~ res.objects", res.objects)
-                                        switch (res.objects) {
-                                            case 'all':
-                                                params = ['users', 'accounts', 'terms', 'courses', 'sections', 'enrollments', 'groups', 'group membership', 'group categories', 'x list', 'user observer', 'admin', 'created by sis'];
-                                                break;
-                                            case 'Basic Provisioning':
-                                                params = ['users', 'accounts', 'terms', 'courses', 'sections', 'enrollments'];
-                                                break;
-                                            default:
-                                                params = res.objects;
-                                                break;
-                                        }
-                                        // res.forEach(chosenReport => {
-                                        // });
+                                        res.objects.forEach(object => {
+                                            params[object] = true;
+                                        });
+                                        reports.data.forEach(report => {
+                                            console.log("made it here");
+                                            // matching the title of the chosen report from the list of all reports
+                                            // todo this part is not fully working
+                                            if (report.title === res.report) {
+                                                instance.post(`/accounts/self/reports/${report.report}`, params)
+                                                    .then(res => {
+                                                        console.log(res);
+                                                    })
+                                            }
+                                        });
                                     })
                             }
-                            // res.forEach(chosenReport => {
-                            // });
+                            // running specific report
                         })
                 })
-            // })
         })
         .catch(error => {
-            if (error.isTtyError) {
-                // Prompt couldn't be rendered in the current environment
-            } else {
-                console.log(error);
-            }
+            console.log(error);
         });
 }
 
