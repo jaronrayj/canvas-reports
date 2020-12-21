@@ -28,7 +28,6 @@ const main = () => {
                 }
             })
             // new Promise((resolve, reject) => {
-            console.log('made it here');
             instance.get(`/accounts/self/reports`)
                 .then(reports => {
                     const listOfReports = [];
@@ -43,7 +42,34 @@ const main = () => {
                             name: 'report'
                         })
                         .then(res => {
-                            console.log(res);
+                            let params;
+                            if (res.report === 'Provisioning' || res.report === 'SIS Export') {
+                                new inquirer
+                                    .prompt({
+                                        type: "checkbox",
+                                        message: "What types of files do you want to run?",
+                                        choices: ['Basic Provisioning', 'all', 'users', 'accounts', 'terms', 'courses', 'sections', 'enrollments', 'groups', 'group membership', 'group categories', 'x list', 'user observer', 'admin', 'created by sis'],
+                                        name: 'objects'
+                                    })
+                                    .then(res => {
+                                        console.log("🚀 ~ file: main.js ~ line 57 ~ //newPromise ~ res.objects", res.objects)
+                                        switch (res.objects) {
+                                            case 'all':
+                                                params = ['users', 'accounts', 'terms', 'courses', 'sections', 'enrollments', 'groups', 'group membership', 'group categories', 'x list', 'user observer', 'admin', 'created by sis'];
+                                                break;
+                                            case 'Basic Provisioning':
+                                                params = ['users', 'accounts', 'terms', 'courses', 'sections', 'enrollments'];
+                                                break;
+                                            default:
+                                                params = res.objects;
+                                                break;
+                                        }
+                                        // res.forEach(chosenReport => {
+                                        // });
+                                    })
+                            }
+                            // res.forEach(chosenReport => {
+                            // });
                         })
                 })
             // })
