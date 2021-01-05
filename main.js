@@ -90,7 +90,6 @@ const main = () => {
                                             if (res.includeDeleted) {
                                                 parameters.parameters['include_deleted'] = true;
                                             }
-                                            console.log("🚀 ~ file: main.js ~ line 60 ~ main ~ parameters", parameters)
                                             instance.post(`/accounts/self/reports/${reportCodeName}`, parameters)
                                                 .then(res => {
                                                     if (debug) {
@@ -133,7 +132,6 @@ const main = () => {
             });
     })
     runReport.then((cb) => {
-        console.log("🚀 ~ file: main.js ~ line 128 ~ runReport.then ~ reportCodeName", cb.reportCodeName)
         let checkReport = () => {
             console.log("checking to see if the report is finished....");
             instance.get(`/accounts/self/reports/${cb.reportCodeName}/${cb.id}`)
