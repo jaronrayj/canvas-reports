@@ -1,5 +1,4 @@
 # canvas-reports
-# canvas-reports
 Purpose of this:
 1. Request a report from a specific Canvas instance
 2. Watch the report to see when it's done
