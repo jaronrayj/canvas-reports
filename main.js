@@ -2,14 +2,8 @@ require('dotenv').config()
 const fs = require('fs');
 const inquirer = require('inquirer');
 const axios = require('axios');
-const axiosThrottle = require('axios-throttle');
-const {
-    resolve
-} = require('path');
 
 let instance;
-let domain;
-axiosThrottle.init(axios, 200)
 const token = process.env.TOKEN
 const debug = false;
 
